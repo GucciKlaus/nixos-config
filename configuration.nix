@@ -46,6 +46,8 @@
       "networkmanager"
       "wireshark"
       "docker"
+      "libvirtd"
+      "vboxusers"
     ];
   };
 
@@ -79,6 +81,10 @@
     # };
   };
 
+  #Virutalisierung
+  virtualisation.virtualbox.host.enable = true;
+  virtualisation.virtualbox.host.enableExtensionPack = true;
+
   # Docker (für Labs/Tools/Container)
   virtualisation.docker.enable = true;
 
@@ -98,6 +104,7 @@
     curl
     pciutils
     tor-browser
+    discord
     # Dev / Build
     gcc
     cmake
