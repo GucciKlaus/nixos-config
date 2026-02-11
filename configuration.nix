@@ -27,6 +27,7 @@
     options = "caps:escape,eurosign:e";
   };
 
+
   # Sound
   services.pipewire = {
     enable = true;
@@ -34,7 +35,7 @@
   };
   security.rtkit.enable = true;
 
-  # SSH (praktisch für Homelab/Raspi)
+  # SSH
   services.openssh.enable = true;
 
   users.users.klaus = {
@@ -67,23 +68,38 @@
 
   # NVIDIA (RTX 3060 Laptop)
   services.xserver.videoDrivers = [ "nvidia" ];
+
   hardware.nvidia = {
     modesetting.enable = true;
     nvidiaSettings = true;
     open = false;
 
-    # Optional (nur wenn Hybrid/Optimus):
-    # prime = {
-    #   offload.enable = true;
-    #   offload.enableOffloadCmd = true;
-    #   intelBusId = "PCI:0:2:0";
-    #   nvidiaBusId = "PCI:1:0:0";
-    # };
-  };
+    powerManagement.enable = true;
 
-  #Virutalisierung
+  prime = {
+    offload.enable = true;
+    offload.enableOffloadCmd = true;
+
+    intelBusId = "PCI:0:2:0";
+    nvidiaBusId = "PCI:1:0:0";
+   };
+ };
+
+ services.xserver.enableCtrlAltBackspace = true;
+
+
+ boot.kernelParams = [
+   "nvidia-drm.modeset=1"
+   "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+ ];
+
+  #Virtualisierung
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
+  #Fucking VBox
+  environment.extraInit = ''export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"'';
+  programs.dconf.enable = true;
+
 
   # Docker (für Labs/Tools/Container)
   virtualisation.docker.enable = true;
@@ -105,6 +121,7 @@
     pciutils
     tor-browser
     discord
+    spotify
     # Dev / Build
     gcc
     cmake
@@ -141,7 +158,7 @@
     
    #docker
    docker-compose
-  ];
 
+];
   system.stateVersion = "25.11";
 }
