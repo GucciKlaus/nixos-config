@@ -35,6 +35,12 @@
   };
   security.rtkit.enable = true;
 
+  #SWAP
+  swapDevices = [{
+  device = "/swapfile";
+  size = 16384; # 16GB (BeamNG)
+  }];
+
   # SSH
   services.openssh.enable = true;
 
@@ -74,7 +80,7 @@
     nvidiaSettings = true;
     open = false;
 
-    powerManagement.enable = true;
+    powerManagement.enable = false;
 
   prime = {
     offload.enable = true;
