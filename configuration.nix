@@ -80,7 +80,7 @@
     nvidiaSettings = true;
     open = false;
 
-    powerManagement.enable = false;
+    powerManagement.enable = true;
 
   prime = {
     offload.enable = true;
@@ -128,6 +128,7 @@
     tor-browser
     discord
     spotify
+    texstudio
     # Dev / Build
     gcc
     cmake
@@ -150,7 +151,7 @@
     wireguard-tools
     socat
     netcat-openbsd
-
+    dig
     # Forensics / Reverse / Debug
     strace
     ltrace
