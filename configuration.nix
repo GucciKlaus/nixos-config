@@ -170,5 +170,60 @@
    docker-compose
 
 ];
+
+#Remove Gnome Features
+environment.gnome.excludePackages = with pkgs; [
+
+  # App Store
+  gnome-software
+
+  # Browser / Mail / Kontakte / Kalender
+  epiphany
+  geary
+  evolution
+  evolution-data-server
+  gnome-contacts
+  gnome-calendar
+
+  # Hilfe / Tour
+  yelp
+  gnome-tour
+
+  # Audio / Video / Kamera / Dokumente / Bilder
+  gnome-music
+  decibels
+  papers
+  snapshot
+  showtime
+  totem
+  cheese
+  evince
+  loupe
+  eog
+  gnome-photos
+  seahorse
+
+  # Remote / Tools / Editor
+  gnome-connections
+  gnome-characters
+  gnome-font-viewer
+  gnome-text-editor
+  simple-scan
+
+  # Maps / Weather / Clocks / Notes
+  gnome-maps
+  gnome-weather
+  gnome-clocks
+  gnome-notes
+
+  # GNOME Games
+  tali
+  iagno
+  hitori
+  atomix
+];
+
+
   system.stateVersion = "25.11";
 }
+
