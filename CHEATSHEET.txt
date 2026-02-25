@@ -1,0 +1,19 @@
+Generationen löschen
+sudo nix-env --delete-generations +5
+Garbage leeren
+sudo nix-collect-garbage -d
+Top-Speicher Verbraucher
+nix-store --query --requisites /run/current-system | xargs -n1 nix-store --query --size | sort -n | tail -20
+Rebuild
+sudo nixos-rebuild switch 
+Update
+sudo nix-channel --update
+sudo nixos-rebuild switch --upgrade
+Größe des Systems
+nix --extra-experimental-features nix-command path-info -Sh /run/current-system
+Top 20 Pakete
+nix-store --query --requisites /run/current-system \
+ | xargs -n1 nix --extra-experimental-features nix-command path-info -Sh \
+ | sort -h \
+ | tail -20
+
