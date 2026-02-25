@@ -129,6 +129,8 @@
     discord
     spotify
     texstudio
+    texliveFull
+    anydesk
     # Dev / Build
     gcc
     cmake
@@ -138,6 +140,7 @@
     python3
     python3Packages.pip
     jetbrains.idea-community
+    go
     # Cybersec / Net
     nmap
     wireshark
