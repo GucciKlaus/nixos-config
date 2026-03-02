@@ -135,6 +135,7 @@
     texliveFull
     anydesk
     displaylink
+    tree
     # Dev / Build
     gcc
     cmake
@@ -171,7 +172,7 @@
     file
     ripgrep
     jq
-    
+    obs-studio    
    #docker
    docker-compose
 
