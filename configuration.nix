@@ -43,6 +43,9 @@
 
   # SSH
   services.openssh.enable = true;
+  # Firewall
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ ];
 
   users.users.klaus = {
     isNormalUser = true;
@@ -73,7 +76,7 @@
   };
 
   # NVIDIA (RTX 3060 Laptop)
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = [ "nvidia" "displaylink"];
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -131,6 +134,7 @@
     texstudio
     texliveFull
     anydesk
+    displaylink
     # Dev / Build
     gcc
     cmake
@@ -141,6 +145,7 @@
     python3Packages.pip
     jetbrains.idea-community
     go
+    rpi-imager
     # Cybersec / Net
     nmap
     wireshark
@@ -155,6 +160,7 @@
     socat
     netcat-openbsd
     dig
+    net-tools
     # Forensics / Reverse / Debug
     strace
     ltrace
