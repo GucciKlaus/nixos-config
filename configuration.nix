@@ -146,9 +146,13 @@
     python3Packages.pip
     jetbrains.idea-community
     go
+    jdk21
     rpi-imager
     # Cybersec / Net
     nmap
+    arp-scan
+    naabu
+    httpx
     wireshark
     tcpdump
     inetutils
