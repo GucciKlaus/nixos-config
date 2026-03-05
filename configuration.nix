@@ -8,7 +8,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos";
+  networking.hostName = "echo";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Vienna";
@@ -142,8 +142,11 @@
     lldb
     clang
     gnumake
+    #Python
     python3
     python3Packages.pip
+    jupyter-all
+    #Dev
     jetbrains.idea-community
     go
     jdk21
