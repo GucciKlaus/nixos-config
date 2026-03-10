@@ -15,7 +15,7 @@
   i18n.defaultLocale = "de_AT.UTF-8";
 
   nixpkgs.config.allowUnfree = true;
-
+  nix.settings.experimental-features = ["nix-command" "flakes"];
   # X11 + GNOME
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
