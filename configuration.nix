@@ -5,9 +5,35 @@
     ./hardware-configuration.nix
   ];
 
+  # =========================================================
+  # Boot
+  # =========================================================
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.initrd.systemd.enable = true;
 
+  boot.kernelParams = [
+    "random.trust_cpu=on"
+    "lockdown=confidentiality"
+    "nvidia-drm.modeset=1"
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+  ];
+
+  # Optional Hardening / Sysctl
+  boot.kernel.sysctl = {
+    "kernel.kptr_restrict" = 2;
+    "kernel.dmesg_restrict" = 1;
+    "net.ipv4.conf.all.rp_filter" = 1;
+    "net.ipv4.conf.default.rp_filter" = 1;
+    "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
+    "net.ipv4.conf.all.accept_source_route" = 0;
+  };
+
+  boot.tmp.useTmpfs = true;
+
+  # =========================================================
+  # System basics
+  # =========================================================
   networking.hostName = "echo";
   networking.networkmanager.enable = true;
 
@@ -15,11 +41,19 @@
   i18n.defaultLocale = "de_AT.UTF-8";
 
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-  # X11 + GNOME
+
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
+  };
+
+  # =========================================================
+  # Desktop / GNOME
+  # =========================================================
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  services.xserver.enableCtrlAltBackspace = true;
 
   services.xserver.xkb = {
     layout = "de";
@@ -27,26 +61,77 @@
     options = "caps:escape,eurosign:e";
   };
 
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-software
 
-  # Sound
+    epiphany
+    geary
+    evolution
+    evolution-data-server
+    gnome-contacts
+    gnome-calendar
+
+    yelp
+    gnome-tour
+
+    gnome-music
+    decibels
+    papers
+    snapshot
+    showtime
+    totem
+    cheese
+    evince
+    loupe
+    eog
+    gnome-photos
+    seahorse
+
+    gnome-connections
+    gnome-characters
+    gnome-font-viewer
+    gnome-text-editor
+    simple-scan
+
+    gnome-maps
+    gnome-weather
+    gnome-clocks
+    gnome-notes
+
+    tali
+    iagno
+    hitori
+    atomix
+  ];
+
+  # =========================================================
+  # Audio / Power / Randomness
+  # =========================================================
   services.pipewire = {
     enable = true;
     pulse.enable = true;
   };
+
   security.rtkit.enable = true;
+  services.power-profiles-daemon.enable = true;
 
-  #SWAP
-  swapDevices = [{
-  device = "/swapfile";
-  size = 16384; # 16GB (BeamNG)
-  }];
+  services.haveged.enable = true;
+  security.audit.enable = true;
 
-  # SSH
-  services.openssh.enable = true;
-  # Firewall
+  zramSwap.enable = true;
+
+  # =========================================================
+  # Firewall / SSH
+  # =========================================================
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [ ];
+  networking.firewall.logRefusedConnections = true;
 
+  services.openssh.enable = true;
+
+  # =========================================================
+  # Users
+  # =========================================================
   users.users.klaus = {
     isNormalUser = true;
     home = "/home/klaus";
@@ -61,22 +146,30 @@
     ];
   };
 
+  # =========================================================
+  # Filesystems / Swap
+  # =========================================================
   fileSystems."/data" = {
     device = "/dev/disk/by-uuid/29a46871-06c2-4f1a-89c8-fa93f2c93453";
     fsType = "ext4";
   };
 
-  # Steam
-  programs.steam.enable = true;
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 16384;
+    }
+  ];
 
-  # Graphics / 32-bit (für Steam/Proton)
+  # =========================================================
+  # Graphics / NVIDIA / DisplayLink
+  # =========================================================
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
   };
 
-  # NVIDIA (RTX 3060 Laptop)
-  services.xserver.videoDrivers = [ "nvidia" "displaylink"];
+  services.xserver.videoDrivers = [ "nvidia" "displaylink" ];
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -84,40 +177,46 @@
     open = false;
 
     powerManagement.enable = true;
+    powerManagement.finegrained = true;
 
-  prime = {
-    offload.enable = true;
-    offload.enableOffloadCmd = true;
+    prime = {
+      offload.enable = true;
+      offload.enableOffloadCmd = true;
 
-    intelBusId = "PCI:0:2:0";
-    nvidiaBusId = "PCI:1:0:0";
-   };
- };
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
 
- services.xserver.enableCtrlAltBackspace = true;
+  # =========================================================
+  # Steam
+  # =========================================================
+  programs.steam.enable = true;
 
+  # =========================================================
+  # Virtualization
+  # =========================================================
+  virtualisation.docker.enable = true;
+  systemd.services.docker.wantedBy = lib.mkForce [ ];
 
- boot.kernelParams = [
-   "nvidia-drm.modeset=1"
-   "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
- ];
-
-  #Virtualisierung
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
-  #Fucking VBox
-  environment.extraInit = ''export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"'';
+
   programs.dconf.enable = true;
 
+  environment.extraInit = ''
+    export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
+  '';
 
-  # Docker (für Labs/Tools/Container)
-  virtualisation.docker.enable = true;
-
-  # Wireshark (setzt Group/Capabilities sauber)
+  # =========================================================
+  # Security / Network tools
+  # =========================================================
   programs.wireshark.enable = true;
 
+  # =========================================================
+  # Packages
+  # =========================================================
   environment.systemPackages = with pkgs; [
-    # Daily
     firefox
     thunderbird
     keepassxc
@@ -136,22 +235,22 @@
     anydesk
     displaylink
     tree
-    # Dev / Build
+
     gcc
     cmake
     lldb
     clang
     gnumake
-    #Python
+
     python3
     python3Packages.pip
     jupyter-all
-    #Dev
+
     jetbrains.idea-community
     go
     jdk21
     rpi-imager
-    # Cybersec / Net
+
     nmap
     arp-scan
     naabu
@@ -169,7 +268,7 @@
     netcat-openbsd
     dig
     net-tools
-    # Forensics / Reverse / Debug
+
     strace
     ltrace
     gdb
@@ -179,65 +278,15 @@
     file
     ripgrep
     jq
-    obs-studio    
-   #docker
-   docker-compose
+    obs-studio
 
-];
+    docker-compose
 
-#Remove Gnome Features
-environment.gnome.excludePackages = with pkgs; [
-
-  # App Store
-  gnome-software
-
-  # Browser / Mail / Kontakte / Kalender
-  epiphany
-  geary
-  evolution
-  evolution-data-server
-  gnome-contacts
-  gnome-calendar
-
-  # Hilfe / Tour
-  yelp
-  gnome-tour
-
-  # Audio / Video / Kamera / Dokumente / Bilder
-  gnome-music
-  decibels
-  papers
-  snapshot
-  showtime
-  totem
-  cheese
-  evince
-  loupe
-  eog
-  gnome-photos
-  seahorse
-
-  # Remote / Tools / Editor
-  gnome-connections
-  gnome-characters
-  gnome-font-viewer
-  gnome-text-editor
-  simple-scan
-
-  # Maps / Weather / Clocks / Notes
-  gnome-maps
-  gnome-weather
-  gnome-clocks
-  gnome-notes
-
-  # GNOME Games
-  tali
-  iagno
-  hitori
-  atomix
-];
-
+    btop
+    powertop
+    iotop
+    mesa-demos
+  ];
 
   system.stateVersion = "25.11";
 }
-
