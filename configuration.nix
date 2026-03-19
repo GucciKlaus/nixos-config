@@ -235,6 +235,8 @@
     anydesk
     displaylink
     tree
+    libreoffice
+    signal-cli
 
     gcc
     cmake
