@@ -38,7 +38,7 @@
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Vienna";
-  i18n.defaultLocale = "de_AT.UTF-8";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   nixpkgs.config.allowUnfree = true;
 
@@ -203,6 +203,32 @@
   virtualisation.virtualbox.host.enableExtensionPack = true;
 
   programs.dconf.enable = true;
+  # ========================================================
+  # Terminal
+  # ========================================================
+  programs.dconf.profiles.user.databases = [
+  {
+    settings = {
+      "org/gnome/terminal/legacy/profiles:" = {
+        default = "b1dcc9dd-5262-4d8d-a863-c897e6d979b9";
+        list = [ "b1dcc9dd-5262-4d8d-a863-c897e6d979b9" ];
+      };
+
+      "org/gnome/terminal/legacy/profiles:b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
+        visible-name = "Default";
+        use-theme-colors = false;
+        use-theme-background = false;
+        foreground-color = "rgb(220,220,220)";
+        background-color = "rgb(30,30,30)";
+        bold-color-same-as-fg = true;
+        use-system-font = false;
+        font = "JetBrains Mono 12";
+        scrollback-unlimited = true;
+        audible-bell = false;
+      };
+    };
+  }
+  ];
 
   environment.extraInit = ''
     export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
@@ -256,7 +282,6 @@
     nmap
     arp-scan
     naabu
-    httpx
     wireshark
     tcpdump
     inetutils
@@ -289,6 +314,8 @@
     iotop
     mesa-demos
   ];
+
+  environment.variables.PATH = [ "$HOME/go/bin" ];
 
   system.stateVersion = "25.11";
 }
