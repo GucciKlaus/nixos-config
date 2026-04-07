@@ -3,6 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./backup-rsync.nix
   ];
 
   # =========================================================
@@ -11,12 +12,15 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
-
+  boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
+  boot.initrd.kernelModules = [ "evdi" ];
   boot.kernelParams = [
     "random.trust_cpu=on"
     "lockdown=confidentiality"
     "nvidia-drm.modeset=1"
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    "nvidia.NVreg_TemporaryFilePath=/run"
+    "nvidia-drm.fbdev=1"
   ];
 
   # Optional Hardening / Sysctl
@@ -54,7 +58,8 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
   services.xserver.enableCtrlAltBackspace = true;
-
+  #X11 no longer supported
+  
   services.xserver.xkb = {
     layout = "de";
     variant = "";
@@ -116,7 +121,7 @@
   services.power-profiles-daemon.enable = true;
 
   services.haveged.enable = true;
-  security.audit.enable = true;
+  #security.audit.enable = true;
 
   zramSwap.enable = true;
 
@@ -129,6 +134,7 @@
 
   services.openssh.enable = true;
 
+  services.tailscale.enable = true;
   # =========================================================
   # Users
   # =========================================================
@@ -169,22 +175,32 @@
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = [ "nvidia" "displaylink" ];
+  services.xserver.videoDrivers = ["nvidia" "displaylink"];
+  systemd.services.dlm.wantedBy = ["multi-user.target" ];
 
   hardware.nvidia = {
+#    package = config.boot.kernelPackages.nvidiaPackages.mkDriver{
+#      version = "595.58.03";
+#      sha256_64bit = "sha256-jA1Plnt5MsSrVxQnKu6BAzkrCnAskq+lVRdtNiBYKfk=";
+#      openSha256 = "sha256-6LvJyT0cMXGS290Dh8hd9rc+nYZqBzDIlItOFk8S4n8=";
+#      settingsSha256 = "sha256-2vLF5Evl2D6tRQJo0uUyY3tpWqjvJQ0/Rpxan3NOD3c=";
+
+#      usePersistenced = false;
+#     };
+      
     modesetting.enable = true;
     nvidiaSettings = true;
-    open = false;
+    open = true;
 
-    powerManagement.enable = true;
+    powerManagement.enable = false;
     powerManagement.finegrained = true;
 
     prime = {
       offload.enable = true;
       offload.enableOffloadCmd = true;
 
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0";
+      intelBusId = "PCI:0@0:2:0";
+      nvidiaBusId = "PCI:1@0:0:0";
     };
   };
 
@@ -262,7 +278,8 @@
     displaylink
     tree
     libreoffice
-    signal-cli
+    heroic
+    super-productivity
 
     gcc
     cmake
@@ -295,6 +312,8 @@
     netcat-openbsd
     dig
     net-tools
+    tailscale
+    rsync
 
     strace
     ltrace
