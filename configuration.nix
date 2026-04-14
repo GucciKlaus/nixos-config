@@ -230,7 +230,7 @@
         list = [ "b1dcc9dd-5262-4d8d-a863-c897e6d979b9" ];
       };
 
-      "org/gnome/terminal/legacy/profiles:b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
+      "org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
         visible-name = "Default";
         use-theme-colors = false;
         use-theme-background = false;
@@ -260,6 +260,7 @@
   # =========================================================
   environment.systemPackages = with pkgs; [
     firefox
+    brave
     thunderbird
     keepassxc
     protonvpn-gui
@@ -286,6 +287,9 @@
     lldb
     clang
     gnumake
+    libnl
+    pkg-config
+    
 
     python3
     python3Packages.pip
@@ -325,6 +329,7 @@
     ripgrep
     jq
     obs-studio
+    nasm
 
     docker-compose
 
