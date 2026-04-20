@@ -18,8 +18,8 @@
     "random.trust_cpu=on"
     "lockdown=confidentiality"
     "nvidia-drm.modeset=1"
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-    "nvidia.NVreg_TemporaryFilePath=/run"
+   # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+   # "nvidia.NVreg_TemporaryFilePath=/run"
     "nvidia-drm.fbdev=1"
   ];
 
@@ -87,9 +87,7 @@
     totem
     cheese
     evince
-    loupe
-    eog
-    gnome-photos
+    #loupe
     seahorse
 
     gnome-connections
@@ -175,7 +173,7 @@
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = ["nvidia" "displaylink"];
+  services.xserver.videoDrivers = [ "modesetting" "nvidia" "displaylink"];
   systemd.services.dlm.wantedBy = ["multi-user.target" ];
 
   hardware.nvidia = {
@@ -300,6 +298,7 @@
     jdk21
     rpi-imager
 
+    imagemagick
     nmap
     arp-scan
     naabu
