@@ -278,7 +278,7 @@
     tree
     libreoffice
     heroic
-    super-productivity
+    imhex
 
     gcc
     cmake
