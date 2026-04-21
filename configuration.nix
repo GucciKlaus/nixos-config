@@ -279,6 +279,7 @@
     libreoffice
     heroic
     imhex
+    mattermost-desktop
 
     gcc
     cmake
