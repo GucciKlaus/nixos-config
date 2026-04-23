@@ -126,10 +126,13 @@
   # =========================================================
   # Firewall / SSH
   # =========================================================
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ ];
-  networking.firewall.logRefusedConnections = true;
-
+  networking.firewall = {
+  enable = true;
+  allowPing = false;
+  allowedTCPPorts = [ ];
+  logRefusedConnections = true;
+  };
+  
   services.openssh.enable = true;
 
   services.tailscale.enable = true;
@@ -261,7 +264,7 @@
     brave
     thunderbird
     keepassxc
-    protonvpn-gui
+    proton-vpn
     git
     vscode
     neovim
@@ -294,7 +297,7 @@
     python3Packages.pip
     jupyter-all
 
-    jetbrains.idea-community
+    jetbrains.idea
     go
     jdk21
     rpi-imager
