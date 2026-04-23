@@ -17,3 +17,5 @@ nix-store --query --requisites /run/current-system \
  | sort -h \
  | tail -20
 
+Temporär Port 22 freischalten firewall
+sudo iptables -I INPUT -p tcp --dport 22 -j ACCEPT
