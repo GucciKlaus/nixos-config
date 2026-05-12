@@ -9,26 +9,19 @@
   # =========================================================
   # Boot
   # =========================================================
-  boot.loader.systemd-boot = {
-   enable = true;
-   editor = false;
-   configurationLimit = 10;
-  };
-
+  boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
   boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
-  # boot.initrd.kernelModules = [ "evdi" ];
+  boot.initrd.kernelModules = [ "evdi" ];
   boot.kernelParams = [
     "random.trust_cpu=on"
-    "lockdown=confidentiality"
+  #  "lockdown=confidentiality"
     "nvidia-drm.modeset=1"
    # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
    # "nvidia.NVreg_TemporaryFilePath=/run"
     "nvidia-drm.fbdev=1"
   ];
-
-  
 
   # Optional Hardening / Sysctl
   boot.kernel.sysctl = {
@@ -55,23 +48,8 @@
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
   };
-
-  nix.gc = {
-   automatic = true;
-   dates = "weekly";
-   options = "--delete-older-than 14d";
-   randomizedDelaySec = "45min";
-  };
-
-  nix.optimise = {
-   automatic = true;
-   dates = ["03:45"];
-  };
-
-  fonts.packages = with pkgs; [
-   jetbrains-mono
-  ];
 
   # =========================================================
   # Desktop / GNOME
@@ -79,7 +57,7 @@
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
-  services.xserver.enableCtrlAltBackspace = false;
+  services.xserver.enableCtrlAltBackspace = true;
   #X11 no longer supported
   
   services.xserver.xkb = {
@@ -88,46 +66,9 @@
     options = "caps:escape,eurosign:e";
   };
 
-  environment.gnome.excludePackages = with pkgs; [
-    gnome-software
-
-    epiphany
-    geary
-    evolution
-    evolution-data-server
-    gnome-contacts
-    gnome-calendar
-
-    yelp
-    gnome-tour
-
-    gnome-music
-    decibels
-    papers
-    snapshot
-    showtime
-    totem
-    cheese
-    evince
-    #loupe
-    seahorse
-
-    gnome-connections
-    gnome-characters
-    gnome-font-viewer
-    gnome-text-editor
-    simple-scan
-
-    gnome-maps
-    gnome-weather
-    gnome-clocks
-    gnome-notes
-
-    tali
-    iagno
-    hitori
-    atomix
-  ];
+ services.gnome.core-apps.enable = false;
+ services.gnome.core-developer-tools.enable = false;
+ services.gnome.games.enable = false;
 
   # =========================================================
   # Audio / Power / Randomness
@@ -140,26 +81,24 @@
   security.rtkit.enable = true;
   services.power-profiles-daemon.enable = true;
 
-  
+  services.haveged.enable = true;
+  #security.audit.enable = true;
+
   zramSwap.enable = true;
 
   # =========================================================
   # Firewall / SSH
   # =========================================================
   networking.firewall = {
-   enable = true;
-   allowPing = false;
-   allowedTCPPorts = [ ];
-   logRefusedConnections = true;
+  enable = true;
+  allowPing = false;
+  allowedTCPPorts = [ ];
+  logRefusedConnections = true;
   };
   
   services.openssh.enable = false;
-  
 
-  services.tailscale = {
-   enable = true;
-   openFirewall = true;
-  };
+  services.tailscale.enable = true;
   # =========================================================
   # Users
   # =========================================================
@@ -171,6 +110,7 @@
       "wheel"
       "networkmanager"
       "wireshark"
+      "docker"
       "libvirtd"
       "vboxusers"
     ];
@@ -236,17 +176,11 @@
   # =========================================================
   # Virtualization
   # =========================================================
-  virtualisation.docker = {
-   enable = false;
-  };
+  virtualisation.docker.enable = true;
+  # systemd.services.docker.wantedBy = lib.mkForce [ ];
 
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
-
-  virtualisation.docker.rootless = {
-	enable = true;
-	setSocketVariable = true;
-  };
 
   programs.dconf.enable = true;
   # ========================================================
@@ -280,31 +214,6 @@
     export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
   '';
 
-
-  
-  nixpkgs.overlays = [
-    (final: prev: {
-      wireshark = prev.wireshark.overrideAttrs (old: {
-        src = final.fetchFromGitLab {
-          owner = "wireshark";
-          repo = "wireshark";
-          rev = "v${old.version}";
-          hash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
-        };
-      });
-
-      wireshark-cli = prev.wireshark-cli.overrideAttrs (old: {
-        src = final.fetchFromGitLab {
-          owner = "wireshark";
-          repo = "wireshark";
-          rev = "v${old.version}";
-          hash = "sha256-Zvrwxjp4LK2J3QnxmPxKKrU01YHQvPyp54UWzeGNCjA=";
-        };
-      });
-    })
-  ];
-  
-
   # =========================================================
   # Security / Network tools
   # =========================================================
@@ -321,6 +230,7 @@
     proton-vpn
     git
     vscode
+    neovim
     wget
     curl
     pciutils
@@ -369,7 +279,7 @@
     wireguard-tools
     socat
     netcat-openbsd
-    dnsutils
+    dig
     net-tools
     tailscale
     rsync
@@ -394,6 +304,6 @@
     mesa-demos
   ];
 
-  
+
   system.stateVersion = "25.11";
 }
