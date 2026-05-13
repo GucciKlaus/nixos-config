@@ -12,15 +12,15 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
-  boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
-  boot.initrd.kernelModules = [ "evdi" ];
+  #boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
+  #boot.initrd.kernelModules = [ "evdi" ];
   boot.kernelParams = [
     "random.trust_cpu=on"
   #  "lockdown=confidentiality"
-    "nvidia-drm.modeset=1"
+  #  "nvidia-drm.modeset=1"
    # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
    # "nvidia.NVreg_TemporaryFilePath=/run"
-    "nvidia-drm.fbdev=1"
+   # "nvidia-drm.fbdev=1"
   ];
 
   # Optional Hardening / Sysctl
@@ -55,8 +55,15 @@
   # Desktop / GNOME
   # =========================================================
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+
+  services.xserver.displayManager.lightdm.enable = true;
+
+  services.xserver.desktopManager.xfce.enable = true;
+  #services.xserver.displayManager.startx.enable = true;
+
+  services.xserver.displayManager.defaultSession = "xfce";
+
+
   services.xserver.enableCtrlAltBackspace = true;
   #X11 no longer supported
   
@@ -66,9 +73,9 @@
     options = "caps:escape,eurosign:e";
   };
 
- services.gnome.core-apps.enable = false;
- services.gnome.core-developer-tools.enable = false;
- services.gnome.games.enable = false;
+ #services.gnome.core-apps.enable = false;
+ #services.gnome.core-developer-tools.enable = false;
+ #services.gnome.games.enable = false;
 
   # =========================================================
   # Audio / Power / Randomness
@@ -79,7 +86,7 @@
   };
 
   security.rtkit.enable = true;
-  services.power-profiles-daemon.enable = true;
+  #services.power-profiles-daemon.enable = true;
 
   services.haveged.enable = true;
   #security.audit.enable = true;
@@ -139,25 +146,23 @@
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = [ "modesetting" "nvidia" "displaylink"];
-  systemd.services.dlm.wantedBy = ["multi-user.target" ];
+  services.xserver.videoDrivers = ["nvidia"];
+  #systemd.services.dlm.wantedBy = ["multi-user.target" ];
+
+  boot.blacklistedKernelModules = [
+  "nouveau"
+  "evdi"
+  ];
 
   hardware.nvidia = {
-#    package = config.boot.kernelPackages.nvidiaPackages.mkDriver{
-#      version = "595.58.03";
-#      sha256_64bit = "sha256-jA1Plnt5MsSrVxQnKu6BAzkrCnAskq+lVRdtNiBYKfk=";
-#      openSha256 = "sha256-6LvJyT0cMXGS290Dh8hd9rc+nYZqBzDIlItOFk8S4n8=";
-#      settingsSha256 = "sha256-2vLF5Evl2D6tRQJo0uUyY3tpWqjvJQ0/Rpxan3NOD3c=";
-
-#      usePersistenced = false;
-#     };
       
     modesetting.enable = true;
     nvidiaSettings = true;
     open = true;
+    package = config.boot.kernelPackages.nvidiaPackages.production;
 
-    powerManagement.enable = true;
-    powerManagement.finegrained = true;
+    #powerManagement.enable = true;
+    #powerManagement.finegrained = false;
 
     prime = {
       offload.enable = true;
@@ -166,7 +171,7 @@
       intelBusId = "PCI:0@0:2:0";
       nvidiaBusId = "PCI:1@0:0:0";
     };
-  };
+ };
 
   # =========================================================
   # Steam
@@ -182,7 +187,7 @@
   virtualisation.virtualbox.host.enable = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
 
-  programs.dconf.enable = true;
+  #programs.dconf.enable = true;
   
 
   environment.extraInit = ''
@@ -215,13 +220,12 @@
     texstudio
     texliveFull
     anydesk
-    displaylink
     tree
     libreoffice
     heroic
     imhex
     mattermost-desktop
-    nautilus
+    #nautilus
     xterm
     xclip
 
