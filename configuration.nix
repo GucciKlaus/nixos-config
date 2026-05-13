@@ -1,9 +1,11 @@
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   imports = [
     ./hardware-configuration.nix
-    ./backup-rsync.nix
   ];
 
   # =========================================================
@@ -12,14 +14,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
-  boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
-  boot.initrd.kernelModules = [ "evdi" ];
+  boot.extraModulePackages = [config.boot.kernelPackages.evdi];
+  boot.initrd.kernelModules = ["evdi"];
   boot.kernelParams = [
     "random.trust_cpu=on"
-  #  "lockdown=confidentiality"
+    #  "lockdown=confidentiality"
     "nvidia-drm.modeset=1"
-   # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-   # "nvidia.NVreg_TemporaryFilePath=/run"
+    # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    # "nvidia.NVreg_TemporaryFilePath=/run"
     "nvidia-drm.fbdev=1"
   ];
 
@@ -47,7 +49,7 @@
   nixpkgs.config.allowUnfree = true;
 
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = ["nix-command" "flakes"];
     auto-optimise-store = true;
   };
 
@@ -59,16 +61,16 @@
   services.desktopManager.gnome.enable = true;
   services.xserver.enableCtrlAltBackspace = true;
   #X11 no longer supported
-  
+
   services.xserver.xkb = {
     layout = "de";
     variant = "";
     options = "caps:escape,eurosign:e";
   };
 
- services.gnome.core-apps.enable = false;
- services.gnome.core-developer-tools.enable = false;
- services.gnome.games.enable = false;
+  services.gnome.core-apps.enable = false;
+  services.gnome.core-developer-tools.enable = false;
+  services.gnome.games.enable = false;
 
   # =========================================================
   # Audio / Power / Randomness
@@ -90,12 +92,12 @@
   # Firewall / SSH
   # =========================================================
   networking.firewall = {
-  enable = true;
-  allowPing = false;
-  allowedTCPPorts = [ ];
-  logRefusedConnections = true;
+    enable = true;
+    allowPing = false;
+    allowedTCPPorts = [];
+    logRefusedConnections = true;
   };
-  
+
   services.openssh.enable = false;
 
   services.tailscale.enable = true;
@@ -139,19 +141,19 @@
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = [ "modesetting" "nvidia" "displaylink"];
-  systemd.services.dlm.wantedBy = ["multi-user.target" ];
+  services.xserver.videoDrivers = ["modesetting" "nvidia" "displaylink"];
+  systemd.services.dlm.wantedBy = ["multi-user.target"];
 
   hardware.nvidia = {
-#    package = config.boot.kernelPackages.nvidiaPackages.mkDriver{
-#      version = "595.58.03";
-#      sha256_64bit = "sha256-jA1Plnt5MsSrVxQnKu6BAzkrCnAskq+lVRdtNiBYKfk=";
-#      openSha256 = "sha256-6LvJyT0cMXGS290Dh8hd9rc+nYZqBzDIlItOFk8S4n8=";
-#      settingsSha256 = "sha256-2vLF5Evl2D6tRQJo0uUyY3tpWqjvJQ0/Rpxan3NOD3c=";
+    #    package = config.boot.kernelPackages.nvidiaPackages.mkDriver{
+    #      version = "595.58.03";
+    #      sha256_64bit = "sha256-jA1Plnt5MsSrVxQnKu6BAzkrCnAskq+lVRdtNiBYKfk=";
+    #      openSha256 = "sha256-6LvJyT0cMXGS290Dh8hd9rc+nYZqBzDIlItOFk8S4n8=";
+    #      settingsSha256 = "sha256-2vLF5Evl2D6tRQJo0uUyY3tpWqjvJQ0/Rpxan3NOD3c=";
 
-#      usePersistenced = false;
-#     };
-      
+    #      usePersistenced = false;
+    #     };
+
     modesetting.enable = true;
     nvidiaSettings = true;
     open = true;
@@ -183,7 +185,6 @@
   virtualisation.virtualbox.host.enableExtensionPack = true;
 
   programs.dconf.enable = true;
-  
 
   environment.extraInit = ''
     export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
@@ -232,7 +233,6 @@
     gnumake
     libnl
     pkg-config
-    
 
     python3
     python3Packages.pip
@@ -282,6 +282,6 @@
     mesa-demos
   ];
 
-
+  # DO NOT CHANGE!
   system.stateVersion = "25.11";
 }
