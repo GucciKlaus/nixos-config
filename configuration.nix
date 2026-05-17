@@ -12,8 +12,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
-  #boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
-  #boot.initrd.kernelModules = [ "evdi" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
+  boot.initrd.kernelModules = [ "evdi" ];
   boot.kernelParams = [
     "random.trust_cpu=on"
   #  "lockdown=confidentiality"
@@ -146,12 +146,11 @@
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = ["nvidia" "displaylink"];
   #systemd.services.dlm.wantedBy = ["multi-user.target" ];
 
   boot.blacklistedKernelModules = [
   "nouveau"
-  "evdi"
   ];
 
   hardware.nvidia = {
@@ -228,7 +227,9 @@
     #nautilus
     xterm
     xclip
-
+    zip
+    unzip
+    
     gcc
     cmake
     lldb
