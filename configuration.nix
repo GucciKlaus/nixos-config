@@ -81,12 +81,15 @@
   # Audio / Power / Randomness
   # =========================================================
   services.pipewire = {
-    enable = true;
-    pulse.enable = true;
+  enable = true;
+  alsa.enable = true;
+  alsa.support32Bit = true;
+  pulse.enable = true;
+  wireplumber.enable = true;
   };
 
   security.rtkit.enable = true;
-  #services.power-profiles-daemon.enable = true;
+  services.power-profiles-daemon.enable = true;
 
   services.haveged.enable = true;
   #security.audit.enable = true;
@@ -206,6 +209,7 @@
     brave
     thunderbird
     keepassxc
+    bitwarden-desktop
     proton-vpn
     git
     vscode
@@ -216,7 +220,6 @@
     tor-browser
     discord
     spotify
-    texstudio
     texliveFull
     anydesk
     tree
@@ -224,7 +227,7 @@
     heroic
     imhex
     mattermost-desktop
-    #nautilus
+    qalculate-qt
     xterm
     xclip
     zip
