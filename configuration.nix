@@ -190,6 +190,24 @@
   virtualisation.virtualbox.host.enableExtensionPack = true;
 
   #programs.dconf.enable = true;
+
+
+  #Test Tunnelsplitting
+  nixpkgs.overlays = [
+  (final: prev: {
+    proton-vpn = prev.proton-vpn.overridePythonAttrs (old: {
+      dependencies = (old.dependencies or []) ++ [
+        final.python313Packages.proton-vpn-daemon
+       ];
+     });
+   })
+  ];
+
+
+   nixpkgs.config.permittedInsecurePackages = [
+                "electron-39.8.10"
+              ];
+
   
 
   environment.extraInit = ''
@@ -208,9 +226,11 @@
     firefox
     brave
     thunderbird
-    keepassxc
     bitwarden-desktop
     proton-vpn
+    python313Packages.proton-vpn-daemon
+    python313Packages.proton-vpn-api-core
+    python313Packages.proton-vpn-local-agent
     git
     vscode
     neovim
@@ -232,6 +252,8 @@
     xclip
     zip
     unzip
+    taskwarrior2
+    anki
     
     gcc
     cmake
