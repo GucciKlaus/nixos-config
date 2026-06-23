@@ -9,19 +9,17 @@
   # =========================================================
   # Boot
   # =========================================================
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.efi = {
+  canTouchEfiVariables = true;
+  efiSysMountPoint = "/boot";
+  };
   boot.initrd.systemd.enable = true;
   boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
   boot.initrd.kernelModules = [ "evdi" ];
   boot.kernelParams = [
     "random.trust_cpu=on"
-  #  "lockdown=confidentiality"
-  #  "nvidia-drm.modeset=1"
-   # "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-   # "nvidia.NVreg_TemporaryFilePath=/run"
-   # "nvidia-drm.fbdev=1"
-  ];
+   ];
 
   # Optional Hardening / Sysctl
   boot.kernel.sysctl = {
@@ -34,6 +32,26 @@
   };
 
   boot.tmp.useTmpfs = true;
+
+  
+  boot.loader.grub = {
+   enable = true;
+   efiSupport = true;
+   devices = [ "nodev" ];
+   useOSProber = true;
+   configurationLimit = 20;
+   theme = "/boot/grub/themes/dedsec/base/1440p";
+  };
+
+  boot.loader.grub.extraEntries = ''
+  menuentry "Parrot OS" {
+     insmod part_gpt
+     insmod fat
+     insmod chain
+     search --fs-uuid --set=root 5708-DC2B
+     chainloader /EFI/PARROT/grubx64.efi
+  }
+  '';
 
   # =========================================================
   # System basics
@@ -52,20 +70,18 @@
   };
 
   # =========================================================
-  # Desktop / GNOME
+  # Desktop / XFCE
   # =========================================================
   services.xserver.enable = true;
 
   services.xserver.displayManager.lightdm.enable = true;
 
   services.xserver.desktopManager.xfce.enable = true;
-  #services.xserver.displayManager.startx.enable = true;
-
-  services.xserver.displayManager.defaultSession = "xfce";
-
+  
+  services.displayManager.defaultSession = "xfce";
 
   services.xserver.enableCtrlAltBackspace = true;
-  #X11 no longer supported
+  
   
   services.xserver.xkb = {
     layout = "de";
@@ -73,10 +89,7 @@
     options = "caps:escape,eurosign:e";
   };
 
- #services.gnome.core-apps.enable = false;
- #services.gnome.core-developer-tools.enable = false;
- #services.gnome.games.enable = false;
-
+ 
   # =========================================================
   # Audio / Power / Randomness
   # =========================================================
@@ -92,7 +105,7 @@
   services.power-profiles-daemon.enable = true;
 
   services.haveged.enable = true;
-  #security.audit.enable = true;
+  security.audit.enable = true;
 
   zramSwap.enable = true;
 
@@ -122,8 +135,7 @@
       "wireshark"
       "docker"
       "libvirtd"
-      "vboxusers"
-    ];
+     ];
   };
 
   # =========================================================
@@ -184,11 +196,7 @@
   # Virtualization
   # =========================================================
   virtualisation.docker.enable = true;
-  # systemd.services.docker.wantedBy = lib.mkForce [ ];
-
-  virtualisation.virtualbox.host.enable = true;
-  virtualisation.virtualbox.host.enableExtensionPack = true;
-
+  
   #programs.dconf.enable = true;
 
 
@@ -231,9 +239,10 @@
     python313Packages.proton-vpn-daemon
     python313Packages.proton-vpn-api-core
     python313Packages.proton-vpn-local-agent
+    qemu
+    OVMF
     git
     vscode
-    neovim
     wget
     curl
     pciutils
@@ -244,6 +253,8 @@
     anydesk
     tree
     libreoffice
+    xournalpp
+    poppler-utils
     heroic
     imhex
     mattermost-desktop
@@ -252,7 +263,6 @@
     xclip
     zip
     unzip
-    taskwarrior2
     anki
     
     gcc
@@ -267,11 +277,7 @@
     python3
     python3Packages.pip
     jupyter-all
-
-    jetbrains.idea
-    jdk21
     rpi-imager
-
     imagemagick
     nmap
     arp-scan
@@ -291,6 +297,7 @@
     net-tools
     tailscale
     rsync
+    nix-index
 
     strace
     ltrace
