@@ -19,3 +19,8 @@ nix-store --query --requisites /run/current-system \
 
 Temporär Port 22 freischalten firewall
 sudo iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+
+Integritätsprüfung
+sudo nix-store --verify --check-contents
+Reparieren
+sudo nix-store --verify --check-contents --repair

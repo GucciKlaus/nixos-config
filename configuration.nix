@@ -43,16 +43,7 @@
    theme = "/boot/grub/themes/dedsec/base/1440p";
   };
 
-  boot.loader.grub.extraEntries = ''
-  menuentry "Parrot OS" {
-     insmod part_gpt
-     insmod fat
-     insmod chain
-     search --fs-uuid --set=root 5708-DC2B
-     chainloader /EFI/PARROT/grubx64.efi
-  }
-  '';
-
+  
   # =========================================================
   # System basics
   # =========================================================
@@ -69,16 +60,17 @@
     auto-optimise-store = true;
   };
 
-  # =========================================================
-  # Desktop / XFCE
-  # =========================================================
-  services.xserver.enable = true;
+   services.xserver.enable = true;
 
-  services.xserver.displayManager.lightdm.enable = true;
+  # =========================================================
+  # Desktop / KDE
+  # =========================================================
 
-  services.xserver.desktopManager.xfce.enable = true;
-  
-  services.displayManager.defaultSession = "xfce";
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.desktopManager.plasma6.enable = true;
+
+  services.displayManager.defaultSession = "plasma";
 
   services.xserver.enableCtrlAltBackspace = true;
   
@@ -105,7 +97,7 @@
   services.power-profiles-daemon.enable = true;
 
   services.haveged.enable = true;
-  security.audit.enable = true;
+  #security.audit.enable = true;
 
   zramSwap.enable = true;
 
@@ -122,6 +114,26 @@
   services.openssh.enable = false;
 
   services.tailscale.enable = true;
+
+  # =========================================================
+  # AntiVirus
+  # =========================================================
+
+  services.clamav = {
+  daemon.enable = true;
+  updater.enable = true;
+
+  scanner = {
+    enable = true;
+    interval = "weekly";
+    scanDirectories = [
+      "/home"
+      "/tmp"
+      "/var/tmp"
+    ];
+  };
+  };  
+
   # =========================================================
   # Users
   # =========================================================
@@ -135,6 +147,7 @@
       "wireshark"
       "docker"
       "libvirtd"
+      "kvm"
      ];
   };
 
@@ -162,7 +175,7 @@
   };
 
   services.xserver.videoDrivers = ["nvidia" "displaylink"];
-  #systemd.services.dlm.wantedBy = ["multi-user.target" ];
+  systemd.services.dlm.wantedBy = ["multi-user.target" ];
 
   boot.blacklistedKernelModules = [
   "nouveau"
@@ -175,8 +188,8 @@
     open = true;
     package = config.boot.kernelPackages.nvidiaPackages.production;
 
-    #powerManagement.enable = true;
-    #powerManagement.finegrained = false;
+    powerManagement.enable = true;
+    powerManagement.finegrained = false;
 
     prime = {
       offload.enable = true;
@@ -196,32 +209,14 @@
   # Virtualization
   # =========================================================
   virtualisation.docker.enable = true;
+  virtualisation.libvirtd.enable = true;
+
+  programs.virt-manager.enable = true;
   
-  #programs.dconf.enable = true;
-
-
-  #Test Tunnelsplitting
-  nixpkgs.overlays = [
-  (final: prev: {
-    proton-vpn = prev.proton-vpn.overridePythonAttrs (old: {
-      dependencies = (old.dependencies or []) ++ [
-        final.python313Packages.proton-vpn-daemon
-       ];
-     });
-   })
-  ];
-
-
-   nixpkgs.config.permittedInsecurePackages = [
+  nixpkgs.config.permittedInsecurePackages = [
                 "electron-39.8.10"
               ];
-
-  
-
-  environment.extraInit = ''
-    export XDG_DATA_DIRS="$XDG_DATA_DIRS:${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
-  '';
-
+ 
   # =========================================================
   # Security / Network tools
   # =========================================================
@@ -231,14 +226,10 @@
   # Packages
   # =========================================================
   environment.systemPackages = with pkgs; [
-    firefox
     brave
     thunderbird
     bitwarden-desktop
     proton-vpn
-    python313Packages.proton-vpn-daemon
-    python313Packages.proton-vpn-api-core
-    python313Packages.proton-vpn-local-agent
     qemu
     OVMF
     git
@@ -254,6 +245,7 @@
     tree
     libreoffice
     xournalpp
+    whatsapp-electron
     poppler-utils
     heroic
     imhex
@@ -308,7 +300,6 @@
     file
     ripgrep
     jq
-    obs-studio
     nasm
 
     docker-compose
@@ -317,6 +308,8 @@
     powertop
     iotop
     mesa-demos
+    clamav
+    lynis
   ];
 
 
